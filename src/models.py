@@ -1,7 +1,8 @@
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
-from sqlalchemy import MetaData, text, ForeignKey
+from sqlalchemy import MetaData, text, ForeignKey, DateTime, func
 from typing import Annotated
-from datetime import datetime
+from datetime import datetime, timezone
+
 from enum import Enum
 
 time_zone = text("TIMEZONE('utc', now())")
@@ -9,13 +10,29 @@ int_pk = Annotated[int, mapped_column(primary_key=True, autoincrement=True)]
 
 class Base(DeclarativeBase):
     metadata = MetaData()
-    
+    __abstract__ = True
+    __mapper_args__ = {
+        'confirm_deleted_rows': False,
+    }
+
+    def __repr__(self):
+        return f'<{self.__class__.__name__}>'
+
+    def to_dict(self) -> dict:
+        result = {}
+        for column in self.__table__.columns:
+            value = getattr(self, column.name)
+            result[column.name] = value
+        return result
+
     created_at: Mapped[datetime] = mapped_column(
-        server_default = time_zone
+        DateTime(timezone=True),
+        server_default = func.timezone('utc', func.now())
     )
     updated_at: Mapped[datetime] = mapped_column(
-        server_default = time_zone,
-        onupdate = time_zone,
+        DateTime(timezone=True),
+        server_default = func.timezone('utc', func.now()),
+        onupdate=lambda: datetime.now(timezone.utc)
     )
 
 class WorkLoad(Enum):
