@@ -1,4 +1,4 @@
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from sqlalchemy import MetaData, text, ForeignKey, DateTime, func
 from typing import Annotated
 from datetime import datetime, timezone
@@ -43,6 +43,16 @@ class Worker(Base):
     __tablename__ = "worker"
     id: Mapped[int_pk]
     username: Mapped[str]
+    resumes = relationship('Resume', back_populates='worker')
+
+class ResumeVacancy(Base):
+    __tablename__ = "resume_vacancy"
+    id_resume: Mapped[int] = mapped_column(
+        ForeignKey('resume.id', ondelete="CASCADE"), primary_key=True,
+    )
+    id_vac: Mapped[int] = mapped_column(
+        ForeignKey('vacancy.id', ondelete="CASCADE"), primary_key=True,
+    )
 
 class Resume(Base):
     __tablename__ = "resume"
@@ -53,8 +63,11 @@ class Resume(Base):
         ForeignKey('worker.id',
                    ondelete="CASCADE"),
     )
+    worker = relationship('Worker', back_populates='resumes')
+    vacancies = relationship('Vacancy', secondary='resume_vacancy', back_populates='resumes')
 
 class Vacancy(Base):
     __tablename__ = "vacancy"
     id: Mapped[int_pk]
     title: Mapped[str]
+    resumes = relationship('Resume', secondary='resume_vacancy', back_populates='vacancies')
