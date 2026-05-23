@@ -7,3 +7,5 @@ engine = create_engine(
     max_overflow=10,
     pool_recycle=3600
 )
+
+session_factory = sessionmaker(bind=engine, expire_on_commit=True)
