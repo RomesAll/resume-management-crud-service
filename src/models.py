@@ -2,8 +2,7 @@ from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from sqlalchemy import MetaData, text, ForeignKey, DateTime, func
 from typing import Annotated
 from datetime import datetime, timezone
-
-from enum import Enum
+import enum
 
 time_zone = text("TIMEZONE('utc', now())")
 int_pk = Annotated[int, mapped_column(primary_key=True, autoincrement=True)]
@@ -35,7 +34,7 @@ class Base(DeclarativeBase):
         onupdate=lambda: datetime.now(timezone.utc)
     )
 
-class WorkLoad(Enum):
+class WorkLoad(str, enum.Enum):
     part_time = "part_time"
     full_time = "full_time"
 
@@ -57,7 +56,6 @@ class ResumeVacancy(Base):
 class Resume(Base):
     __tablename__ = "resume"
     id: Mapped[int_pk]
-    title: Mapped[str]
     workload: Mapped[WorkLoad]
     worker_id: Mapped[int] = mapped_column(
         ForeignKey('worker.id',
@@ -70,4 +68,5 @@ class Vacancy(Base):
     __tablename__ = "vacancy"
     id: Mapped[int_pk]
     title: Mapped[str]
+    compensation: Mapped[int]
     resumes = relationship('Resume', secondary='resume_vacancy', back_populates='vacancies')
