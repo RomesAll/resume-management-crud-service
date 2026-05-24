@@ -1,4 +1,4 @@
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 from datetime import datetime
 from src.models import Resume, WorkLoad
 
@@ -14,7 +14,7 @@ class WorkerGet(WorkerCreate):
     updated_at: datetime
 
 class WokerUpdate(WorkerCreate):
-    id: int
+    id: int = Field(exclude=True)
 
 class ResumeCreate(BaseDto):
     title: str
