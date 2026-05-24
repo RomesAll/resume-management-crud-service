@@ -56,7 +56,6 @@ class ResumeVacancy(Base):
 class Resume(Base):
     __tablename__ = "resume"
     id: Mapped[int_pk]
-    title: Mapped[str]
     workload: Mapped[WorkLoad]
     worker_id: Mapped[int] = mapped_column(
         ForeignKey('worker.id',
