@@ -69,4 +69,5 @@ class Vacancy(Base):
     __tablename__ = "vacancy"
     id: Mapped[int_pk]
     title: Mapped[str]
+    compensation: Mapped[int]
     resumes = relationship('Resume', secondary='resume_vacancy', back_populates='vacancies')
